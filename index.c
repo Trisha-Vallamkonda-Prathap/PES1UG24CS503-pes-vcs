@@ -136,7 +136,8 @@ int index_status(const Index *index) {
 
 // ─── TODO: Implement these ───────────────────────────────────────────────────
 
-// Load the index from .pes/index.
+// Load the index from .pes/index into memory.
+// If the file does not exist yet, returns an empty index (not an error).
 //
 // HINTS - Useful functions:
 //   - fopen (with "r"), fscanf, fclose : reading the text file line by line
