@@ -149,7 +149,7 @@ int commit_walk(commit_walk_fn callback, void *ctx) {
     return 0;
 }
 
-// Read the current HEAD commit hash.
+// Read the current HEAD commit hash for the implemenation
 int head_read(ObjectID *id_out) {
     FILE *f = fopen(HEAD_FILE, "r");
     if (!f) return -1;
