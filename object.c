@@ -94,9 +94,33 @@ int object_exists(const ObjectID *id) {
 //
 // Returns 0 on success, -1 on error.
 int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out) {
-    // TODO: Implement
-    (void)type; (void)data; (void)len; (void)id_out;
-    return -1;
+    int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out) {
+    // 1. Map enum type to string for the header
+    const char *type_str;
+    switch (type) {
+        case OBJ_BLOB:   type_str = "blob"; break;
+        case OBJ_TREE:   type_str = "tree"; break;
+        case OBJ_COMMIT: type_str = "commit"; break;
+        default: return -1;
+    }
+
+    // 2. Prepare the header: "type size\0"
+    char header[64];
+    int header_len = snprintf(header, sizeof(header), "%s %zu", type_str, len);
+    header[header_len++] = '\0'; 
+
+    // 3. Compute SHA-256 hash of (header + data)
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256_CTX sha256;
+    SHA256_Init(&sha256);
+    SHA256_Update(&sha256, header, header_len);
+    SHA256_Update(&sha256, data, len);
+    SHA256_Final(hash, &sha256);
+
+    // Copy binary hash to the output structure
+    memcpy(id_out->hash, hash, SHA256_DIGEST_LENGTH);
+
+    return 0; // Temporary return for Commit #1
 }
 
 // Read an object from the store.
