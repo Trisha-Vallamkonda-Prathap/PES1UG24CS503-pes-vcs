@@ -43,7 +43,7 @@ int tree_parse(const void *data, size_t len, Tree *tree_out) {
     while (ptr < end && tree_out->count < MAX_TREE_ENTRIES) {
         TreeEntry *entry = &tree_out->entries[tree_out->count];
 
-        // 1. Safely find the space character for the mode
+        // 1. Safely find the space character for the mode for required implementation
         const uint8_t *space = memchr(ptr, ' ', end - ptr);
         if (!space) return -1;
 
