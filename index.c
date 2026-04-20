@@ -183,6 +183,7 @@ int index_save(const Index *index) {
     *sorted = *index;
     qsort(sorted->entries, sorted->count, sizeof(IndexEntry), compare_index_entries);
 
+    // atomic write: write to temp file first, then rename to avoid partial reads
     FILE *f = fopen(INDEX_FILE ".tmp", "w");
     if (!f) {
         free(sorted);
