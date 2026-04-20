@@ -119,7 +119,7 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
     // 4. Compute hash
     compute_hash(full, total_len, id_out);
 
-    // 5. Deduplication check
+    // 5. Deduplication: skip write if object already stored
     if (object_exists(id_out)) {
         free(full);
         return 0;
