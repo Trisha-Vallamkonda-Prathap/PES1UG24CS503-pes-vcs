@@ -104,7 +104,7 @@ int tree_serialize(const Tree *tree, void **data_out, size_t *len_out) {
     return 0;
 }
 
-// ─── IMPLEMENTED ─────────────────────────────────────────────────────────────
+// ─── tree_from_index: builds recursive tree from staged index ─────────────────
 
 // Forward declaration of object_write (implemented in object.c)
 int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out);
