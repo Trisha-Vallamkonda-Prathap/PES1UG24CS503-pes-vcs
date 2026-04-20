@@ -119,7 +119,19 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
 
     // Copy binary hash to the output structure
     memcpy(id_out->hash, hash, SHA256_DIGEST_LENGTH);
+// 4. Determine storage path (.pes/objects/XX/YYYY...)
+    char hex[HASH_HEX_SIZE];
+    hash_to_hex(id_out, hex);
 
+    char dir_path[PATH_MAX];
+    char file_path[PATH_MAX];
+    snprintf(dir_path, sizeof(dir_path), ".pes/objects/%.2s", hex);
+    snprintf(file_path, sizeof(file_path), "%s/%s", dir_path, hex + 2);
+
+    // Create the sharded directory structure
+    mkdir(".pes", 0755);
+    mkdir(".pes/objects", 0755);
+    mkdir(dir_path, 0755);
     return 0; // Temporary return for Commit #1
 }
 
