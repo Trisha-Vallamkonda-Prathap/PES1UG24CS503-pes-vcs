@@ -94,7 +94,6 @@ int object_exists(const ObjectID *id) {
 //
 // Returns 0 on success, -1 on error.
 int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out) {
-    int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out) {
     // 1. Map enum type to string for the header
     const char *type_str;
     switch (type) {
@@ -103,7 +102,7 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
         case OBJ_COMMIT: type_str = "commit"; break;
         default: return -1;
     }
-
+    
     // 2. Prepare the header: "type size\0"
     char header[64];
     int header_len = snprintf(header, sizeof(header), "%s %zu", type_str, len);
@@ -119,7 +118,8 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
 
     // Copy binary hash to the output structure
     memcpy(id_out->hash, hash, SHA256_DIGEST_LENGTH);
-// 4. Determine storage path (.pes/objects/XX/YYYY...)
+
+    // 4. Determine storage path (.pes/objects/XX/YYYY...)
     char hex[HASH_HEX_SIZE];
     hash_to_hex(id_out, hex);
 
@@ -132,9 +132,24 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
     mkdir(".pes", 0755);
     mkdir(".pes/objects", 0755);
     mkdir(dir_path, 0755);
-    return 0; // Temporary return for Commit #1
-}
 
+    // 5. Write atomically using temp file
+    char temp_path[PATH_MAX];
+    snprintf(temp_path, sizeof(temp_path), "%s/tmp_XXXXXX", dir_path);
+    int fd = mkstemp(temp_path);
+    if (fd < 0) return -1;
+
+    write(fd, header, header_len);
+    write(fd, data, len);
+    close(fd);
+
+    if (rename(temp_path, file_path) < 0) {
+        unlink(temp_path);
+        return -1;
+    }
+
+    return 0; 
+}
 // Read an object from the store.
 //
 // Steps:
