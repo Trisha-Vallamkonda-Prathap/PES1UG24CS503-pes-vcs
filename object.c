@@ -178,7 +178,7 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
         return -1;
     }
 
-    // 12. fsync directory
+    // 12. fsync shard dir to persist the rename on disk
     int dir_fd = open(dir_path, O_DIRECTORY | O_RDONLY);
     if (dir_fd >= 0) {
         fsync(dir_fd);
