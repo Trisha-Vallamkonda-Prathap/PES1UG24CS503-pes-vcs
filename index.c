@@ -253,6 +253,7 @@ int index_add(Index *index, const char *path) {
     }
     free(data);
 
+   // Upsert: update existing entry if path already staged, else insert new one
     IndexEntry *entry = index_find(index, path);
     if (!entry) {
         if (index->count >= MAX_INDEX_ENTRIES) return -1;
