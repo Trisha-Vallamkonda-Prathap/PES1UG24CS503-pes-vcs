@@ -245,7 +245,7 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
 	    }
 	    fclose(f);
 	
-	    // 4. Verify hash (integrity check)
+	    // 4. Recompute SHA-256 and verify against filename hash
 	    ObjectID computed;
 	    compute_hash(buf, fsize, &computed);
 	    if (memcmp(computed.hash, id->hash, HASH_SIZE) != 0) {
