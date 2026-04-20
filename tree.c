@@ -192,7 +192,7 @@ int tree_from_index(ObjectID *id_out) {
     if (index_load(&index) != 0) return -1;
     if (index.count == 0) return -1;
 
-    // Sort entries by path so the recursive helper can group them
+    // Sort by path first so subdirectory entries are contiguous for grouping
     qsort(index.entries, (size_t)index.count, sizeof(IndexEntry), compare_entries_by_path);
 
     return write_tree_level(index.entries, index.count, "", 0, id_out);
