@@ -8,15 +8,15 @@
 // PROVIDED functions: compute_hash, object_path, object_exists, hash_to_hex, hex_to_hash
 // TODO functions:     object_write, object_read
 
-#include "pes.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <unistd.h>
-#include <openssl/evp.h>
-
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <limits.h>
+#include <openssl/sha.h>
+#include "pes.h"
 // ─── PROVIDED ────────────────────────────────────────────────────────────────
 
 void hash_to_hex(const ObjectID *id, char *hex_out) {
@@ -139,8 +139,12 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
     int fd = mkstemp(temp_path);
     if (fd < 0) return -1;
 
-    write(fd, header, header_len);
-    write(fd, data, len);
+    if (write(fd, header, header_len) != header_len || 
+        write(fd, data, len) != (ssize_t)len) {
+        close(fd);
+        unlink(temp_path);
+        return -1;
+    }
     close(fd);
 
     if (rename(temp_path, file_path) < 0) {
